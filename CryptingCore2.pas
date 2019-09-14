@@ -12,8 +12,7 @@ interface
 procedure LoadMessageToModule(d: array of byte);
 
 ///Основная расшифровывающая функция.
-///Откатит предыдущую попытку расшифровать текст (нужно, если она была неудачной),
-///если cancelPrevoiusUnciphering будет true
+///Откатит предыдущую попытку расшифровать текст (нужно, если она была неудачной), если cancelPrevoiusUnciphering будет true
 function Uncipher(cancelPrevoiusUnciphering: boolean): string;
 
 ///Пытается создать новый алфавит и записать его в файл
@@ -36,12 +35,10 @@ function LoadAlphabet(name: string): integer;
 ///Возвращает 0 при удаче, -1 - если такого файла не найдено
 function LoadDict(fileName: string): integer;
 
-///Удаляет весь список редакций. Настоятельно рекомендуется использовать при загрузках
-///новых шифровок
+///Удаляет весь список редакций. Настоятельно рекомендуется использовать при загрузках новых шифровок
 procedure EraseAllEdits();
 
-///Основная шифрующая функция. Возвращает массив байт,
-///готовую шифровку
+///Основная шифрующая функция. Возвращает массив байт, готовую шифровку
 function Cipher(s: string): array of byte;
 
 ///Сохраняет уже открытый алфавит с заменой имеющегося. Бинарный файл!
@@ -110,14 +107,10 @@ procedure randmutations();
 var
   randX, randQ: integer;
 begin
-  loop MUTATIONS do//Count раз
-  begin
-    
+  loop MUTATIONS do begin//Count раз   
     randQ := randomInteger(LENGTH_OF_ALPHABET);//выбираем случайный бит в алфавите
     randX := randomInteger(LENGTH_OF_SYMBOL);
-    
     alphabet[randQ][randX] := not alphabet[randQ][randX];//и инвертируем этот бит
-    
   end;
 end;
 
@@ -184,8 +177,7 @@ begin
   else reservedAlphabet := copy(alphabet);//иначе - резервируем новую версию
   result := '';//строка с результатом. Пока пустая.
   j0 := 0;
-  while w + LENGTH_OF_SYMBOL div 8 <= message.Length do 
-  begin
+  while w + LENGTH_OF_SYMBOL div 8 <= message.Length do begin
     var u := new BitArray(message[w:w + LENGTH_OF_SYMBOL div 8]);//отдельный шифросимвол
     if (edits.ContainsKey(j0)) then begin//если ещё не все запросы обработаны и смотреть на последний, если совпадает
       num := avdict[edits[j0]];//номер определить принудительно
@@ -269,31 +261,23 @@ var
   c: char;
   i: integer = 0;
 begin
-  if fileExists(fileName) then //если имеется файл..
-  begin
+  if fileExists(fileName) then begin//если имеется файл..
     reset(t, fileName);        //то открыть его
     
     avdict.Clear();              // по-хорошему, нет смысла иметь более 1 загруженного словаря
     revdict.Clear();           // (неоднозначность по char'ам устранима, а по номерам... чуть сложнее)
     
-    while not t.Eof do//пока не закончится...
-    begin
-      read(t, c);     //читать по символу
+    while not t.Eof do begin//пока не закончится...
+     read(t, c);     //читать по символу
       
-      if not avdict.ContainsKey(c) then  //если такой символ уже есть...
-      begin
+      if not avdict.ContainsKey(c) then begin //если такой символ уже есть...
         avdict.Add(c, i);                  //добавить в словари
         revdict.Add(i, c);
         i += 1;//тик счетчика по номерам
       end;
     end;
     close(t);//закрыть файл
-    result := 0;
-  end
-  else
-  begin
-    result := -1;
-  end;
+    result := 0;  end else result := -1;
 end;
 
 ///Пытается создать новый алфавит и записать его в файл
@@ -310,25 +294,18 @@ begin
   rng.GetBytes(randBytes);
   if not fileExists(fileName) then 
   begin
-    if (bit_lengthSymbol mod 8) = 0 then 
-    begin
-      
+    if (bit_lengthSymbol mod 8) = 0 then begin
       assign(t, fileName);//открываем файл
       rewrite(t);
       t.Reset();
       
       write(t, lengthAlphabet, bit_lengthSymbol);//записываем длину алфавита (4 байта, знаковый) и длину шифросимвола в битах (4 байта, знаковый)
       
-      for var i:=0 to randBytes.Length-1 do   //
-        begin                                 // заполнить файл 
-          write(t, randBytes[i]);             // случайными байтами 
-        end;                                  //
-      
+      for var i:=0 to randBytes.Length-1 do write(t, randBytes[i]); //заполнить файл случайными байтами      
       close(t);//закрыть файл
       
       result := 0;//вернуть 0, что всё прошло успешно
-    end
-    else result := 1;
+    end else result := 1;
   end
   else result := -1;
 end;
@@ -340,17 +317,13 @@ end;
 function addEdit(pos: integer; should_read_as: char): integer;
 begin
   if avdict.ContainsKey(should_read_as) then begin
-    if edits.ContainsKey(pos) then
-    begin
+    if edits.ContainsKey(pos) then begin
       edits[pos] := should_read_as;
       result := 1;
-    end
-    else 
-    begin
+    end else begin
       edits.Add(pos, should_read_as);
       result := 0;
-    end;
-  end
+    end; end 
   else result := -1;
 end;
 end.
